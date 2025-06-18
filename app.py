@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from Algoritma import Barang, knapsack
+from Algoritma import Barang, knapsack  # ini fungsi knapsack asli kamu
 
 app = Flask(__name__)
 
@@ -25,8 +25,6 @@ def knapsack_page():
             items.append(Barang(nama, berat, profit))
             index += 1
 
-        hasil = knapsack(items, kapasitas)
-    return render_template('knapsack.html', hasil=hasil, items=items)
+        hasil = knapsack(items, kapasitas)  # sekarang ini aman
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    return render_template('knapsack.html', hasil=hasil, items=items)
