@@ -355,7 +355,7 @@
 </head>
 <body>
     <div class="container">
-        <button class="btn btn-back" onclick="window.location.href='first.html'">← Kembali ke Halaman Utama</button>
+        <a class="btn btn-back" href="/index">← Kembali ke Halaman Utama</a>
         
         <div class="header">
             <h1>Knapsack 0/1 Dynamic Programming</h1>
@@ -364,94 +364,94 @@
 
         <div class="error-message" id="errorMessage"></div>
 
-        <div class="input-section" id="inputSection">
-            <h2>Input Data Barang</h2>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="itemName">Nama Barang</label>
-                    <input type="text" class="form-control" id="itemName" placeholder="Contoh: Barang A">
+        <form method="POST">
+            <div class="input-section">
+                <h2>📦 Input Data Barang</h2>
+
+                <div id="barang-container">
+                    {% for i in range(3) %}
+                    <div class="form-row">
+                        <input name="nama_{{ i }}" class="form-control" placeholder="Nama Barang" required>
+                        <input type="number" name="berat_{{ i }}" class="form-control" placeholder="Berat" required>
+                        <input type="number" name="profit_{{ i }}" class="form-control" placeholder="Profit" required>
+                        <button type="button" class="btn btn-danger" onclick="hapusBaris(this)">Hapus</button>
+                    </div>
+                    {% endfor %}
                 </div>
-                <div class="form-group">
-                    <label for="itemWeight">Berat</label>
-                    <input type="number" class="form-control" id="itemWeight" placeholder="5" min="1">
-                </div>
-                <div class="form-group">
-                    <label for="itemProfit">Profit</label>
-                    <input type="number" class="form-control" id="itemProfit" placeholder="100" min="1">
-                </div>
-                <div class="form-group">
-                    <button type="button" class="btn btn-success" onclick="addItem()">Tambah</button>
+
+                <button type="button" class="btn btn-success" onclick="tambahBaris()">+ Tambah Barang</button>
+
+                <div class="capacity-input">
+                    <label for="kapasitas"><strong>Kapasitas Knapsack:</strong></label>
+                    <input type="number" class="form-control" name="kapasitas" placeholder="Contoh: 5" min="1" required>
+                    <button type="submit" class="btn btn-primary">🚀 Hitung Solusi</button>
                 </div>
             </div>
+        </form>
 
-            <div class="capacity-input">
-                <label for="capacity"><strong>Kapasitas Knapsack:</strong></label>
-                <input type="number" class="form-control" id="capacity" placeholder="10" min="1" value="5">
-                <button type="button" class="btn btn-primary" onclick="solveKnapsack()">Hitung Solusi</button>
+        {% if hasil %}
+        <div class="results-section show">
+            <div class="final-result">
+                <h3>🏆 Solusi Optimal Ditemukan!</h3>
+                <div class="result-item">📦 Komposisi: {{ hasil.solusiFinal.komposisi }}</div>
+                <div class="result-item">💰 Total Profit: {{ hasil.solusiFinal.profit }}</div>
+                <div class="result-item">⚖️ Total Berat: {{ hasil.solusiFinal.berat }}</div>
             </div>
 
-            <div class="items-list">
-                <h3>Daftar Barang</h3>
-                <div id="itemsList">
-                    <!-- Items akan ditampilkan di sini -->
+            <div class="process-visualization">
+                <h3>🔍 Visualisasi Proses Dynamic Programming</h3>
+                {% for tahap in hasil.visualisasi %}
+                <div class="stage">
+                    <div class="stage-header">
+                        TAHAP {{ loop.index }}: Mempertimbangkan {{ tahap.barang }} (Profit: {{ tahap.profit }}, Berat: {{ tahap.berat }})
+                    </div>
+                    <table class="dp-table">
+                        <thead>
+                            <tr>
+                                <th>Kapasitas (y)</th>
+                                <th>f{{ loop.index0 }}(y)</th>
+                                <th>P+f{{ loop.index0 }}(y-W)</th>
+                                <th>f{{ loop.index }}(y)</th>
+                                <th>Solusi Optimum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for baris in tahap.tabel %}
+                            <tr>
+                                <td>{{ baris['y'] }}</td>
+                                <td>{{ baris['f prev'] }}</td>
+                                <td>{{ baris['calculate'] if baris['calculate'] != none else '-∞' }}</td>
+                                <td><strong>{{ baris['f new'] }}</strong></td>
+                                <td>{{ baris['solusi optimum'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
+                {% endfor %}
             </div>
         </div>
-
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Menghitung solusi optimal...</p>
-        </div>
-
-        <div class="results-container" id="resultsContainer">
-            <div class="final-result" id="finalResult">
-                <!-- Hasil akhir akan ditampilkan di sini -->
-            </div>
-
-            <div class="process-visualization" id="processVisualization">
-                <!-- Visualisasi proses akan ditampilkan di sini -->
-            </div>
-            
-            <button class="btn btn-primary" onclick="backToInput()">↩ Kembali ke Input</button>
-        </div>
+        {% endif %}
     </div>
 
     <script>
-    function solveKnapsack() {
-        const capacity = parseInt(document.getElementById('capacity').value);
-        if (!capacity || capacity <= 0) {
-            showError('Mohon masukkan kapasitas yang valid!');
-            return;
+        function tambahBaris() {
+            const container = document.getElementById('barang-container');
+            const index = container.children.length;
+            const div = document.createElement('div');
+            div.className = 'form-row';
+            div.innerHTML = `
+                <input name="nama_${index}" class="form-control" placeholder="Nama Barang" required>
+                <input type="number" name="berat_${index}" class="form-control" placeholder="Berat" required>
+                <input type="number" name="profit_${index}" class="form-control" placeholder="Profit" required>
+                <button type="button" class="btn btn-danger" onclick="hapusBaris(this)">Hapus</button>
+            `;
+            container.appendChild(div);
         }
 
-        if (items.length === 0) {
-            showError('Mohon tambahkan minimal satu barang!');
-            return;
+        function hapusBaris(button) {
+            button.parentElement.remove();
         }
-
-        hideError();
-        document.getElementById('loading').classList.add('show');
-        document.getElementById('inputSection').style.display = 'none';
-
-        fetch('/solve', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ items: items, kapasitas: capacity })
-        })
-        .then(res => res.json())
-        .then(result => {
-            displayResults(result);
-            document.getElementById('loading').classList.remove('show');
-            document.getElementById('resultsContainer').classList.add('show');
-            document.getElementById('resultsContainer').scrollIntoView({behavior: 'smooth'});
-        })
-        .catch(err => {
-            showError('Terjadi kesalahan saat menghitung!');
-            document.getElementById('loading').classList.remove('show');
-            document.getElementById('inputSection').style.display = 'block';
-        });
-    }
     </script>
 </body>
 </html>
