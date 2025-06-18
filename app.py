@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from Algoritma import Barang, knapsack
+from Algoritma import Barang, knapsack 
 
 app = Flask(__name__)
 
@@ -27,4 +27,4 @@ def knapsack_page():
 
         hasil = knapsack(items, kapasitas)  # sekarang ini aman
 
-    return render_template('/knapsack', hasil=hasil, items=items)
+    return render_template('knapsack.html', hasil=hasil, items=items)
