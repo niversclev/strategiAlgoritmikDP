@@ -7,15 +7,14 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/knapsack')
-def knapsack():
+@app.route('/knapsack', methods=['GET', 'POST'])
+def knapsack_page():
     hasil = None
     items = []
 
     if request.method == 'POST':
         kapasitas = int(request.form['kapasitas'])
 
-        # Ambil semua barang yang dikirim dari form
         index = 0
         while True:
             nama = request.form.get(f'nama_{index}')
@@ -27,7 +26,7 @@ def knapsack():
             index += 1
 
         hasil = knapsack(items, kapasitas)
-    return render_template('knapsack.html',hasil=hasil, items=items)
+    return render_template('knapsack.html', hasil=hasil, items=items)
 
 if __name__ == '__main__':
     app.run(debug=True)
