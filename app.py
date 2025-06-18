@@ -5,6 +5,10 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    return render_template('index.html')
+
+@app.route('/knapsack')
+def knapsack():
     hasil = None
     items = []
 
@@ -23,8 +27,7 @@ def index():
             index += 1
 
         hasil = knapsack(items, kapasitas)
-
-    return render_template('index.html', hasil=hasil, items=items)
+    return render_template('knapsack.html',hasil=hasil, items=items)
 
 if __name__ == '__main__':
     app.run(debug=True)
