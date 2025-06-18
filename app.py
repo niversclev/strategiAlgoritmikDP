@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from Algoritma import Barang, knapsack  # ini fungsi knapsack asli kamu
+from Algoritma import Barang, knapsack
 
 app = Flask(__name__)
 

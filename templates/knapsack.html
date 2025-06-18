@@ -482,37 +482,40 @@
         }
 
         function solveKnapsack() {
-            const capacity = parseInt(document.getElementById('capacity').value);
-            
-            if (!capacity || capacity <= 0) {
-                showError('Mohon masukkan kapasitas yang valid!');
-                return;
-            }
+        const capacity = parseInt(document.getElementById('capacity').value);
 
-            if (items.length === 0) {
-                showError('Mohon tambahkan minimal satu barang!');
-                return;
-            }
-
-            hideError();
-            
-            // Show loading
-            document.getElementById('loading').classList.add('show');
-            document.getElementById('inputSection').style.display = 'none';
-
-            // Simulate processing time
-            setTimeout(() => {
-                const result = knapsack(items, capacity);
-                displayResults(result);
-                
-                document.getElementById('loading').classList.remove('show');
-                document.getElementById('resultsContainer').classList.add('show');
-                document.getElementById('inputSection').style.display = 'none';
-                
-                // Scroll to results
-                document.getElementById('resultsContainer').scrollIntoView({behavior: 'smooth'});
-            }, 1000);
+        if (!capacity || capacity <= 0) {
+            showError('Mohon masukkan kapasitas yang valid!');
+            return;
         }
+
+        if (items.length === 0) {
+            showError('Mohon tambahkan minimal satu barang!');
+            return;
+        }
+
+        hideError();
+        document.getElementById('loading').classList.add('show');
+        document.getElementById('inputSection').style.display = 'none';
+
+        fetch('/solve', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({items: items, kapasitas: capacity})
+        })
+        .then(res => res.json())
+        .then(result => {
+            displayResults(result);
+            document.getElementById('loading').classList.remove('show');
+            document.getElementById('resultsContainer').classList.add('show');
+            document.getElementById('resultsContainer').scrollIntoView({behavior: 'smooth'});
+        })
+        .catch(err => {
+            showError('Terjadi kesalahan saat menghitung!');
+            document.getElementById('loading').classList.remove('show');
+            document.getElementById('inputSection').style.display = 'block';
+        });
+    }
 
         function backToInput() {
             document.getElementById('resultsContainer').classList.remove('show');
