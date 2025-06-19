@@ -1,3 +1,8 @@
+# Kelas Barang
+# Atribut
+# nama: nama barang (str)
+# berat: berat barang (int)
+# profit: profit barang (int)
 class Barang:
     def __init__(self, nama, berat, profit):
         self.nama = nama
@@ -5,9 +10,29 @@ class Barang:
         self.profit = int(profit)
 
 
+# Method untuk menyelesaikan masalah Knapsack menggunakan Dynamic Programming
 ## Kamus data
 # items: list of Barang yang merupakan parameter
 # kapasitas: parameter yang merupakan kapasitas maksimum knapsack (int)
+# jumlahBarang: jumlah barang yang ada (int)
+# visualProses: list untuk menyimpan proses visualisasi setiap tahap (list of dict)
+# tabelProses: list untuk menyimpan tabel DP pada setiap tahap (list of list of dict)
+# tabel0: list untuk menyimpan kolom awal dengan profit 0 (list of dict)
+# solusi0: list untuk menyimpan solusi awal (list of int)
+# barangSekarang: objek Barang yang sedang diproses pada tahap ini (tipe kelas Barang)
+# outputSekarang: dict untuk menyimpan output setiap tahap (dict)
+# kolomSekarang: list untuk menyimpan kolom pada tahap ini (list of dict)
+# dataTidakDipilih: dict yang menyimpan data jika barang tidak dipilih (dict)
+# profitTidakDipilih: profit jika barang tidak dipilih (int)
+# profitJikaAmbil: profit jika barang dipilih (int)
+# sisaKapasitas: kapasitas yang tersisa jika barang dipilih (int)
+# dataDipilih: dict yang menyimpan data jika barang dipilih (dict)
+# profitTerbaik: profit terbaik antara memilih atau tidak memilih barang (int)
+# solusiTerbaik: list yang menyimpan solusi terbaik antara memilih atau tidak memilih barang (list of int)
+# hasilFinal: dict yang menyimpan hasil akhir dari tabel DP (dict)
+# profitFinal: profit maksimum yang dapat diperoleh (int)
+# listSolusi: list yang menyimpan solusi akhir (list of int)    
+
 def knapsack(items, kapasitas):
     jumlahBarang = len(items)
     visualProses = []
@@ -15,11 +40,11 @@ def knapsack(items, kapasitas):
     
     # aku buat sebuah kolom yang isinya 0 (profit o dan hasil x juga 0)
     # ini kaya prses buat tabel manual di sisa kapasitas 0
-    kolom0 = []
+    tabel0 = []
     solusi0 = [0] * jumlahBarang
     for i in range(kapasitas + 1):
-        kolom0.append({'profit': 0, 'solusi': solusi0.copy()})
-    tabelProses.append(kolom0)
+        tabel0.append({'profit': 0, 'solusi': solusi0.copy()})
+    tabelProses.append(tabel0)
     
     # sekarang aku buat tabel untuk setiap barang 
     # jadi nanti bertahap gitu barangnya
@@ -33,7 +58,7 @@ def knapsack(items, kapasitas):
             'tabel': []
         }
         
-        kolomSekarang = []
+        tabelSekarang = []
         for j in range(0, kapasitas + 1, 1):
             # pilihan 1: kalau barangnya tidak dipilih
             dataTidakDipilih = tabelProses[i-1][j] # -> ini nunjukin kalo kt ambil data sebelumnya
@@ -56,7 +81,7 @@ def knapsack(items, kapasitas):
                 profitTerbaik = profitTidakDipilih
                 solusiTerbaik = dataTidakDipilih['solusi']
             #ok ini cara nyimpen data ke tabel
-            kolomSekarang.append({'profit': profitTerbaik, 'solusi': solusiTerbaik})
+            tabelSekarang.append({'profit': profitTerbaik, 'solusi': solusiTerbaik})
         
             dataBarisVisualisasi = {
                 'y': j,
@@ -68,7 +93,7 @@ def knapsack(items, kapasitas):
             outputSekarang['tabel'].append(dataBarisVisualisasi)
         
         # simpan output setiap tahap
-        tabelProses.append(kolomSekarang)
+        tabelProses.append(tabelSekarang)
         visualProses.append(outputSekarang)
         
     # hasil akhir berarti
@@ -88,6 +113,7 @@ def knapsack(items, kapasitas):
         'visualisasi': visualProses,
         'solusiFinal': solusiFinal
     }
+
 
 def display_terminal(hasil_lengkap):
     """
